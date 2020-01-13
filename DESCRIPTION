@@ -5,7 +5,7 @@ Authors@R:
     person(given = "Andrea",
            family = "Becsek",
            email = "andrea.becsek@bristol.ac.uk",
-           role = c("aut", "cre")))
+           role = c("aut", "cre"))
 Description: Fit Gaussian Naive Bayes model and make predictions
 License: MIT + file LICENSE
 Encoding: UTF-8
