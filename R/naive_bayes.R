@@ -10,6 +10,8 @@
 #' @param y column vector that stores each observation's class labels
 #'
 #' @return
+#'
+#' @import stats
 #' @export
 #'
 #' @examples
@@ -46,17 +48,18 @@ naive_bayes <- function(X, y) {
 #' Makes predictions based on the fitted naive_bayes model by using a
 #' Gaussian assumption that each variable is normally ditributed.
 #'
-#' @param instance of naive_bayes class
+#' @param object instance of naive_bayes class
 #' @param x_new test data matrix with observations as rows and features as columns
 #'
 #' @return predicted class labels
+#' @import stats
 #' @export
 #'
 #' @examples
 #'
-predict.naive_bayes <- function(obj, x_new) {
-  prior <- obj$prior
-  summaries <- obj$summaries
+predict.naive_bayes <- function(object, x_new, ...) {
+  prior <- object$prior
+  summaries <- object$summaries
   n <- dim(x_new)[1]
   d <- dim(x_new)[2]
   k <- dim(summaries)[1]

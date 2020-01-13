@@ -4,12 +4,12 @@
 \alias{predict.naive_bayes}
 \title{Predictions for Naive Bayes}
 \usage{
-\method{predict}{naive_bayes}(obj, x_new)
+\method{predict}{naive_bayes}(object, x_new, ...)
 }
 \arguments{
-\item{x_new}{test data matrix with observations as rows and features as columns}
+\item{object}{instance of naive_bayes class}
 
-\item{instance}{of naive_bayes class}
+\item{x_new}{test data matrix with observations as rows and features as columns}
 }
 \value{
 predicted class labels

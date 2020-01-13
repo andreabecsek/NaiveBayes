@@ -12,6 +12,9 @@ features as columns}
 
 \item{y}{column vector that stores each observation's class labels}
 }
+\value{
+
+}
 \description{
 Creates a summary matrix of the means and standard devations
 for the data matrix split by classes and features. It also

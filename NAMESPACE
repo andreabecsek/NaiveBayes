@@ -2,3 +2,4 @@
 
 S3method(predict,naive_bayes)
 export(naive_bayes)
+import(stats)
