@@ -1,0 +1,1 @@
+[![Build Status](https://travis-ci.com/andreabecsek/panda.png?branch=master)](https://travis-ci.com/andreabecsek/NaiveBayes)
