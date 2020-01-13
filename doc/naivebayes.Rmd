@@ -1,0 +1,148 @@
+---
+title: "Naive Bayes"
+author: "Andrea Becsek"
+date: "2 January 2020"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(tidyverse)
+library(ggplot2)
+library(magrittr)
+library(dplyr)
+```
+
+```{r}
+data <- read.csv("~/Documents/Project/stats-computing-1/data/data.csv")
+data %<>%  
+  dplyr::select(-c(id, X))
+```
+
+```{r}
+# use 70% of the data for training and 30% for testing
+n <- nrow(data)
+train_size <- floor(0.8*n)
+
+# sample indeces for split
+train_ind <- sample(seq(n),size = train_size, replace = FALSE)
+train <- data[train_ind,]
+test <- data[-train_ind,]
+```
+
+```{r}
+y <- train$diagnosis
+X <- train %>% select(-diagnosis) %>% as.matrix()
+
+y_test <- test$diagnosis
+X_test <- test %>% select(-diagnosis) %>% as.matrix()
+
+X <- unname(cbind(1,X))
+X_test <- unname(cbind(1,X_test))
+# change factor levels to B=0 and M=1
+levels(y) <- c(0,1)
+y %<>% matrix
+mode(y) <- 'numeric'
+
+levels(y_test) <-c(0,1)
+y_test %<>% matrix
+mode(y_test) <- 'numeric'
+```
+
+
+
+<!-- Conditional probabilities -->
+<!-- ```{r} -->
+<!-- gaussian <- function(x,mean,var){ -->
+<!--   return(exp(-(x-mean)^2/(2*var^2)) * (1/sqrt(2*pi*var^2))) -->
+<!-- } -->
+<!-- ``` -->
+
+Calculate mean and variance for for every feature for both classes
+# ```{r}
+# # create empty matrices for all classes
+# summaries <- function(X,y){
+#   d <- dim(X)[2]
+#   k <- length(unique(y))
+#   summ <- matrix(rep(0,d*2),ncol=d)
+#   summs <- replicate(2,summ,simplify = F)
+#   for(i in 1:k){
+#     summs[[i]] <- t(sapply(1:d, function(x) c(mean(X[,x]),sd(X[,x])),simplify = T))
+#   }
+#    return(summs)
+# }
+# ```
+
+
+Class probabilities
+```{r}
+prior <- function(y){
+  k <- sort(unique(y)[,1])
+  prior <- rep(0,length(k))
+  for(i in 1:length(k)){
+    prior[i] <- sum(y==k[i])/length(y)
+  }
+  return(prior)
+}
+```
+
+```{r}
+prior(y)
+```
+
+```{r}
+# create empty matrices for all classes
+summaries <- function(X,y){
+  d <- dim(X)[2]
+  k <- length(unique(y))
+  classes <- array(rep(1,d*k*2), dim=c(k,d,2))
+  for(i in 1:k){
+    X_k <- X[which(y==(i-1)),]
+    classes[i,,1] <- apply(X_k,2,mean)
+    classes[i,,2] <- apply(X_k,2,sd)
+  }
+  return(classes)
+}
+```
+
+Conditional probs p(x/class)
+```{r}
+# for x_new a single observation
+cond <- function(X_new,summaries,priors){
+  n <- dim(X_new)[1]
+  d <- dim(X_new)[2]
+  k <- dim(summaries)[1]
+  result <- matrix(rep(0,n*k),nrow=n)
+  for(obs in 1:n){
+    for(class in 1:k){
+      post <- log(priors[class])
+      for(feat in 1:d){
+        mu <- summaries[class,feat,1]
+        sd <- summaries[class,feat,2]
+        cond <- dnorm(X_new[obs,feat],mu, sd, log = TRUE)
+        post <- post + cond
+      }
+      result[obs,class] <- post
+    }
+  }
+  pred <- apply(result,1,which.max) 
+  # return(result)
+  return(as.matrix(pred-1))
+}  
+```
+
+```{r}
+confusion_matrix <- as.data.frame(table(predictions,y_test))
+
+ggplot(confusion_matrix,aes(y=predictions,x=y_test))+
+  geom_tile(aes(fill=Freq))+
+  geom_text(aes(label=sprintf("%1.0f", Freq)),color="white",fontface="bold")+
+  labs(y="Predicted class",x="True class")+
+  theme_minimal()
+```
+
+
+
